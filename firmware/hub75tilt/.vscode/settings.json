@@ -1,0 +1,18 @@
+{
+    "files.associations": {
+        "random": "cpp",
+        "cstdint": "cpp",
+        "*.tcc": "cpp",
+        "cmath": "cpp",
+        "unordered_map": "cpp",
+        "fstream": "cpp",
+        "istream": "cpp",
+        "numeric": "cpp",
+        "ostream": "cpp",
+        "sstream": "cpp",
+        "bitset": "cpp",
+        "string_view": "cpp",
+        "regex": "cpp",
+        "compare": "cpp"
+    }
+}

@@ -13,7 +13,7 @@ void System::init()
   dmd_.disableFastTextShift(true);
   dmd_.setRotation(1);
   dmd_.selectFont(&font_arial_14_);
-  dmd_.setBrightness(50);
+  dmd_.setBrightness(20);
 
   pinMode(BTN0, INPUT_PULLUP);
   pinMode(BTN1, INPUT_PULLUP);

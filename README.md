@@ -37,6 +37,20 @@ It is based on a Hub75 matrix panel driven by a Raspberry Pi Pico (RP2040) and e
 
 ## Build
 
+### Material
+
+| Name                                            | Quantity |
+| ----------------------------------------------- | :------: |
+| 64x64 Hub75 LED Matrix                          |    1     |
+| Raspberry Pi Pico RP2040 (optional Wifi)        |    1     |
+| LIS3DH                                          |    1     |
+| Buttons                                         |    2     |
+| Optional External Power Supply, e.g., via USB-C |    1     |
+
+An external power supply is needed for higher brightness. Warning: the panel can be **very** bright. Start with low values and increment iteratively.
+
+### Instructions
+
 The electronics are built into the original frame to keep the form factor as small as possible. Cutouts for wiring can be easily added by some pliers as the plastics are pretty brittle. Pinout: see the bottom of the page.
 
 <p align="center">
@@ -129,4 +143,45 @@ You can add the front cover to ensure the LEDs are protected when transporting t
 
 ## Firmware
 
-see `firmware/`
+The firmware is based on PlatformIO and builds on the Arduino framework layer. A system object is globally allocated that abstracts hardware-specific calls for the games. An app manager allows to select and switch between different apps (e.g., games). Apps are derived from `Playable` and are registered to the app manager after system initialization.
+
+```C
+System sys = System();
+
+AppManager appm = AppManager(&sys);
+
+PGoL pgol       = PGoL(50, 100);
+PBalance pbal   = PBalance();
+PGCollect pgcol = PGCollect();
+
+void setup(void)
+{
+  Serial.begin(9600);
+  sys.init();
+  appm.registerPlayable(&pgol);
+  appm.registerPlayable(&pbal);
+  appm.registerPlayable(&pgcol);
+}
+```
+
+The main loop synchronizes the game speed to a defined frame rate. It updates the system state and calls the app manager, who directs to the currently selected application. The application draws to a frame buffer that is swapped in `sys.loopEnd();`. The active buffer is used to update the latched data in the LED panel by hardware support.
+
+```C
+void loop(void)
+{
+  uint32_t interval = 20;  
+  uint32_t prev_step = 0;
+  uint32_t printed = 0;
+
+  while(1)
+ {
+    if ((millis() - prev_step) > interval)
+ {
+      prev_step = millis();
+      sys.loopBegin();
+      appm.loop();
+      sys.loopEnd();
+ }
+ }
+}
+```
